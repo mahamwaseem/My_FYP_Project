@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import Group
-from .models import User 
+from .models import User  # Custom User model
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, min_length=8)
@@ -11,19 +11,15 @@ class RegisterSerializer(serializers.ModelSerializer):
         fields = ('username', 'password', 'email', 'role', 'first_name', 'last_name')
 
     def create(self, validated_data):
-        # Extract requested role, default to 'Viewer' if not provided
+        # Default to 'Viewer' if no role is provided
         requested_role = validated_data.pop('role', 'Viewer')
 
-        # Security Constraint: Only allow 'Viewer' for self-registration.
-        # Manager and Administrator must be assigned by an existing Admin.
-        restricted_roles = ['Administrator', 'Manager']
-        
-        if requested_role in restricted_roles:
-            role_to_assign = 'Viewer' # Force to lowest privilege for safety
+        # Security: Prevent self-assignment of 'Administrator' or 'Manager'
+        if requested_role in ['Administrator', 'Manager']:
+            role_to_assign = 'Viewer'
         else:
             role_to_assign = requested_role
 
-        # Creating the user in the database
         user = User.objects.create_user(
             username=validated_data['username'],
             email=validated_data.get('email'),
@@ -32,12 +28,17 @@ class RegisterSerializer(serializers.ModelSerializer):
             last_name=validated_data.get('last_name', '')
         )
         
-        # Assign the user to the specific Group (Role) in the database
+        # Assign to Django Group in SQL Server
         try:
             group = Group.objects.get(name=role_to_assign)
             user.groups.add(group)
         except Group.DoesNotExist:
-            # If the group doesn't exist, we don't crash, but user gets no group
             pass
             
         return user
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'phone', 'role', 'first_name', 'last_name']
+        read_only_fields = ['role']
