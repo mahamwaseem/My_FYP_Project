@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework_simplejwt',
     'corsheaders',
     'authentication',
 ]
@@ -80,7 +81,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'mssql',
         'NAME': 'FinTrackDB',
-        'HOST': 'DESKTOP-DHFGP56\SQLEXPRESS', 
+        'HOST': 'DESKTOP-DHFGP56\\SQLEXPRESS', 
         'PORT': '',
         'OPTIONS': {
             'driver': 'ODBC Driver 17 for SQL Server',
@@ -148,3 +149,6 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
 }
+
+AUTH_USER_MODEL = 'authentication.User'
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
