@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Account Group – COA Module</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{--ag-primary:#2563eb;--ag-primary-hover:#1d4ed8;--ag-primary-light:#dbeafe;--ag-primary-pale:#eff6ff;--ag-success:#16a34a;--ag-success-bg:#dcfce7;--ag-warning:#d97706;--ag-warning-bg:#fef3c7;--ag-danger:#dc2626;--ag-danger-bg:#fee2e2;--ag-bg:#f0f6ff;--ag-surface:#ffffff;--ag-border:#c7d7f0;--ag-border-light:#e2ecfb;--ag-text:#1e3a5f;--ag-text-muted:#64789b;--ag-text-light:#94a8c4;--ag-header-start:#1e40af;--ag-header-end:#2563eb;--ag-radius:10px;--ag-radius-sm:6px;--ag-shadow:0 2px 12px rgba(37,99,235,.10);--ag-shadow-md:0 4px 24px rgba(37,99,235,.14);--ag-font:'Nunito',sans-serif;--ag-mono:'JetBrains Mono',monospace;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--ag-font);background:var(--ag-bg);color:var(--ag-text);}
+.ag-page{display:flex;flex-direction:column;min-height:100vh;}
+.ag-header{background:linear-gradient(135deg,var(--ag-header-start),var(--ag-header-end));padding:0 28px;height:64px;display:flex;align-items:center;box-shadow:0 2px 16px rgba(30,64,175,.25);position:sticky;top:0;z-index:100;}
+.ag-header-inner{display:flex;align-items:center;gap:14px;}
+.ag-header-icon{width:40px;height:40px;background:rgba(255,255,255,.15);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;backdrop-filter:blur(4px);flex-shrink:0;}
+.ag-header-title{font-size:1.25rem;font-weight:800;color:#fff;letter-spacing:-.01em;line-height:1.2;}
+.ag-header-sub{font-size:.75rem;color:rgba(255,255,255,.72);font-weight:500;letter-spacing:.02em;}
+.ag-toast{padding:10px 20px;font-size:.85rem;font-weight:600;display:flex;align-items:center;gap:8px;}
+.ag-toast--success{background:var(--ag-success-bg);color:var(--ag-success);}
+.ag-content{display:flex;gap:20px;padding:24px 28px;flex:1;align-items:flex-start;}
+.ag-panel{background:var(--ag-surface);border:1px solid var(--ag-border-light);border-radius:var(--ag-radius);box-shadow:var(--ag-shadow);overflow:hidden;}
+.ag-panel-head{padding:18px 22px 14px;border-bottom:1px solid var(--ag-border-light);background:linear-gradient(180deg,var(--ag-primary-pale),#fff);}
+.ag-panel-head--row{display:flex;align-items:center;justify-content:space-between;}
+.ag-panel-badge{display:inline-block;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ag-primary);background:var(--ag-primary-light);padding:2px 8px;border-radius:30px;margin-bottom:4px;}
+.ag-panel-title{font-size:1rem;font-weight:800;color:var(--ag-text);}
+.ag-count-pill{font-size:.78rem;font-weight:700;color:var(--ag-primary);background:var(--ag-primary-light);padding:4px 12px;border-radius:20px;border:1px solid rgba(37,99,235,.15);}
+.ag-form-panel{width:320px;flex-shrink:0;}
+.ag-form{padding:20px 22px;display:flex;flex-direction:column;gap:16px;}
+.ag-field{display:flex;flex-direction:column;gap:6px;}
+.ag-label{font-size:.78rem;font-weight:700;color:var(--ag-text-muted);text-transform:uppercase;letter-spacing:.05em;}
+.ag-required{color:var(--ag-danger);margin-left:2px;}
+.ag-input-wrap{position:relative;}
+.ag-input{width:100%;height:40px;padding:0 12px;border:1.5px solid var(--ag-border);border-radius:var(--ag-radius-sm);font-family:var(--ag-font);font-size:.88rem;font-weight:600;color:var(--ag-text);background:#fff;outline:none;}
+.ag-input:focus{border-color:var(--ag-primary);box-shadow:0 0 0 3px rgba(37,99,235,.12);background:var(--ag-primary-pale);}
+.ag-input--readonly{background:var(--ag-bg);color:var(--ag-text-muted);cursor:not-allowed;font-family:var(--ag-mono);font-size:.82rem;padding-right:52px;}
+.ag-input-badge{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:.65rem;font-weight:700;text-transform:uppercase;color:var(--ag-text-light);background:var(--ag-border-light);padding:2px 6px;border-radius:4px;}
+.ag-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:16px 22px 20px;border-top:1px solid var(--ag-border-light);background:var(--ag-primary-pale);}
+.ag-btn{display:flex;align-items:center;justify-content:center;gap:7px;height:40px;padding:0 14px;border:none;border-radius:var(--ag-radius-sm);font-family:var(--ag-font);font-size:.83rem;font-weight:700;cursor:pointer;transition:all .18s;letter-spacing:.02em;white-space:nowrap;}
+.ag-btn:disabled{opacity:.45;cursor:not-allowed;}
+.ag-btn--primary{background:var(--ag-primary);color:#fff;box-shadow:0 2px 8px rgba(37,99,235,.28);}
+.ag-btn--primary:hover:not(:disabled){background:var(--ag-primary-hover);box-shadow:0 4px 14px rgba(37,99,235,.35);transform:translateY(-1px);}
+.ag-btn--warning{background:var(--ag-warning-bg);color:var(--ag-warning);border:1.5px solid #fbbf24;}
+.ag-btn--warning:hover:not(:disabled){background:#fef9c3;transform:translateY(-1px);}
+.ag-btn--danger{background:var(--ag-danger-bg);color:var(--ag-danger);border:1.5px solid #fca5a5;}
+.ag-btn--danger:hover:not(:disabled){background:#fee2e2;transform:translateY(-1px);}
+.ag-btn--ghost{background:transparent;color:var(--ag-text-muted);border:1.5px solid var(--ag-border);}
+.ag-btn--ghost:hover:not(:disabled){background:#f1f5f9;color:var(--ag-text);}
+.ag-table-panel{flex:1;min-width:0;display:flex;flex-direction:column;}
+.ag-table-wrapper{overflow-x:auto;overflow-y:auto;max-height:calc(100vh - 260px);flex:1;}
+.ag-table{width:100%;border-collapse:collapse;font-size:.86rem;}
+.ag-table thead tr{background:linear-gradient(180deg,#e8f0fe,#dbeafe);position:sticky;top:0;z-index:1;}
+.ag-table th{padding:11px 16px;text-align:left;font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--ag-primary);border-bottom:2px solid var(--ag-border);white-space:nowrap;}
+.ag-table-row{border-bottom:1px solid var(--ag-border-light);cursor:pointer;transition:background .14s;}
+.ag-table-row:hover{background:var(--ag-primary-pale);}
+.ag-table-row--selected{background:var(--ag-primary-light)!important;box-shadow:inset 3px 0 0 var(--ag-primary);}
+.ag-table td{padding:11px 16px;color:var(--ag-text);font-weight:500;vertical-align:middle;}
+.ag-td-index{color:var(--ag-text-light);font-size:.78rem;font-family:var(--ag-mono);width:40px;}
+.ag-td-id{font-family:var(--ag-mono);font-weight:600;color:var(--ag-primary);}
+.ag-td-name{font-weight:700;color:var(--ag-text);}
+.ag-selected-hint{padding:10px 18px;border-top:1px solid var(--ag-border-light);background:var(--ag-primary-pale);font-size:.78rem;color:var(--ag-primary);font-weight:600;}
+.ag-selected-hint strong{font-weight:800;}
+@media(max-width:820px){.ag-content{flex-direction:column;padding:16px;gap:16px;}.ag-form-panel{width:100%;}}
+</style>
+</head>
+<body>
+<div class="ag-page" id="app">
+
+  <header class="ag-header">
+    <div class="ag-header-inner">
+      <div class="ag-header-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+      </div>
+      <div>
+        <h1 class="ag-header-title">Account Group</h1>
+        <p class="ag-header-sub">Chart of Accounts — Group Management</p>
+      </div>
+    </div>
+  </header>
+
+  <div id="toast-area"></div>
+
+  <div class="ag-content">
+    <!-- FORM PANEL -->
+    <aside class="ag-panel ag-form-panel">
+      <div class="ag-panel-head">
+        <span class="ag-panel-badge" id="form-badge">Add New</span>
+        <h2 class="ag-panel-title">Group Details</h2>
+      </div>
+      <div class="ag-form">
+        <div class="ag-field">
+          <label class="ag-label" for="groupId">Group ID</label>
+          <div class="ag-input-wrap">
+            <input id="groupId" class="ag-input ag-input--readonly" type="text" value="6" readonly/>
+            <span class="ag-input-badge">Auto</span>
+          </div>
+        </div>
+        <div class="ag-field">
+          <label class="ag-label" for="locationId">Location ID</label>
+          <input id="locationId" class="ag-input" type="number" value="1" min="1"/>
+        </div>
+        <div class="ag-field">
+          <label class="ag-label" for="nameInput">Group Name <span class="ag-required">*</span></label>
+          <input id="nameInput" class="ag-input" type="text" placeholder="e.g. Assets, Liability…" autocomplete="off"/>
+        </div>
+      </div>
+      <div class="ag-actions">
+        <button class="ag-btn ag-btn--primary" onclick="handleSave()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          <span id="save-btn-text">Save</span>
+        </button>
+        <button class="ag-btn ag-btn--warning" onclick="handleEdit()" id="edit-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          <span>Edit</span>
+        </button>
+        <button class="ag-btn ag-btn--danger" onclick="handleDelete()" id="delete-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+          <span>Delete</span>
+        </button>
+        <button class="ag-btn ag-btn--ghost" onclick="clearForm()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          <span>Clear</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- TABLE PANEL -->
+    <section class="ag-panel ag-table-panel">
+      <div class="ag-panel-head ag-panel-head--row">
+        <div>
+          <span class="ag-panel-badge">Records</span>
+          <h2 class="ag-panel-title">Groups List</h2>
+        </div>
+        <div class="ag-count-pill" id="count-pill">5 groups</div>
+      </div>
+      <div class="ag-table-wrapper">
+        <table class="ag-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Location ID</th>
+              <th>Group ID</th>
+              <th>Name</th>
+            </tr>
+          </thead>
+          <tbody id="table-body"></tbody>
+        </table>
+      </div>
+      <div class="ag-selected-hint" id="selected-hint" style="display:none;">
+        ▶ Selected: <strong id="hint-name"></strong> (ID: <span id="hint-id"></span>)
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+  let groups = [
+    {id:1,location_id:1,name:'Assets'},
+    {id:2,location_id:1,name:'Capital'},
+    {id:3,location_id:1,name:'Liability'},
+    {id:4,location_id:1,name:'Income'},
+    {id:5,location_id:1,name:'Expense'},
+  ];
+  let selectedId = null;
+  let editingId = null;
+
+  function toast(msg, type='success') {
+    const area = document.getElementById('toast-area');
+    const el = document.createElement('div');
+    el.className = `ag-toast ag-toast--${type}`;
+    el.innerHTML = `<span>${type==='success'?'✓':'⚠'} ${msg}</span>`;
+    area.appendChild(el);
+    setTimeout(() => el.remove(), 3000);
+  }
+
+  function renderTable() {
+    const tbody = document.getElementById('table-body');
+    tbody.innerHTML = groups.map((g, i) => `
+      <tr class="ag-table-row ${selectedId===g.id?'ag-table-row--selected':''}" onclick="selectRow(${g.id})">
+        <td class="ag-td-index">${i+1}</td>
+        <td>${g.location_id}</td>
+        <td class="ag-td-id">${g.id}</td>
+        <td class="ag-td-name">${g.name}</td>
+      </tr>`).join('');
+    const nextId = groups.length > 0 ? Math.max(...groups.map(g=>g.id)) + 1 : 1;
+    if (!editingId) document.getElementById('groupId').value = nextId;
+    document.getElementById('count-pill').textContent = `${groups.length} ${groups.length===1?'group':'groups'}`;
+  }
+
+  function selectRow(id) {
+    selectedId = id;
+    renderTable();
+    const g = groups.find(x=>x.id===id);
+    document.getElementById('selected-hint').style.display = '';
+    document.getElementById('hint-name').textContent = g.name;
+    document.getElementById('hint-id').textContent = g.id;
+  }
+
+  function handleSave() {
+    const name = document.getElementById('nameInput').value.trim();
+    const locId = parseInt(document.getElementById('locationId').value) || 1;
+    if (!name) { toast('Group name is required.', 'error'); return; }
+    if (editingId) {
+      const g = groups.find(x=>x.id===editingId);
+      g.name = name; g.location_id = locId;
+      toast('Group updated successfully.');
+      editingId = null;
+      document.getElementById('form-badge').textContent = 'Add New';
+      document.getElementById('save-btn-text').textContent = 'Save';
+    } else {
+      const newId = groups.length > 0 ? Math.max(...groups.map(g=>g.id)) + 1 : 1;
+      groups.push({id: newId, location_id: locId, name});
+      toast('Group created successfully.');
+    }
+    clearForm();
+    renderTable();
+  }
+
+  function handleEdit() {
+    if (!selectedId) { toast('Please select a row to edit.', 'error'); return; }
+    const g = groups.find(x=>x.id===selectedId);
+    editingId = g.id;
+    document.getElementById('groupId').value = g.id;
+    document.getElementById('locationId').value = g.location_id;
+    document.getElementById('nameInput').value = g.name;
+    document.getElementById('form-badge').textContent = 'Edit Mode';
+    document.getElementById('save-btn-text').textContent = 'Update';
+    document.getElementById('nameInput').focus();
+  }
+
+  function handleDelete() {
+    if (!selectedId) { toast('Please select a row to delete.', 'error'); return; }
+    const g = groups.find(x=>x.id===selectedId);
+    if (!confirm(`Delete group "${g.name}"?`)) return;
+    groups = groups.filter(x=>x.id!==selectedId);
+    toast(`Group "${g.name}" deleted.`);
+    selectedId = null;
+    document.getElementById('selected-hint').style.display = 'none';
+    clearForm();
+    renderTable();
+  }
+
+  function clearForm() {
+    editingId = null;
+    selectedId = null;
+    document.getElementById('nameInput').value = '';
+    document.getElementById('locationId').value = '1';
+    document.getElementById('form-badge').textContent = 'Add New';
+    document.getElementById('save-btn-text').textContent = 'Save';
+    document.getElementById('selected-hint').style.display = 'none';
+    renderTable();
+  }
+
+  renderTable();
+</script>
+</body>
+</html>

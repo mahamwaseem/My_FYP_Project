@@ -382,6 +382,7 @@ const styles = `
     gap: 24px;
   }
 
+  /* Generic panels (Vouchers, Reports) */
   .menu-panel {
     border: 1.5px solid var(--border);
     border-radius: 16px;
@@ -389,12 +390,10 @@ const styles = `
     transition: all 0.3s;
     box-shadow: 0 2px 8px rgba(0,0,0,0.04);
   }
-
   .menu-panel:hover {
     box-shadow: 0 8px 32px rgba(13,148,136,0.12);
     border-color: rgba(13,148,136,0.3);
   }
-
   .panel-header {
     padding: 18px 22px;
     background: linear-gradient(135deg, var(--teal), var(--teal-dark));
@@ -402,34 +401,25 @@ const styles = `
     display: flex; align-items: center; justify-content: space-between;
     user-select: none;
   }
-
   .panel-header-left { display: flex; align-items: center; gap: 12px; }
-
   .panel-hicon {
     width: 38px; height: 38px; background: rgba(255,255,255,0.2);
     border-radius: 10px; display: flex; align-items: center; justify-content: center;
     font-size: 18px;
   }
-
   .panel-title { color: white; font-size: 1rem; font-weight: 700; }
   .panel-count { color: rgba(255,255,255,0.75); font-size: 0.75rem; font-weight: 500; }
-
   .panel-chevron {
     color: white; font-size: 0.9rem;
     transition: transform 0.3s;
     opacity: 0.8;
   }
   .panel-chevron.open { transform: rotate(180deg); }
-
-  .panel-body {
-    background: white;
-  }
-
+  .panel-body { background: white; }
   .panel-items-grid {
     display: grid; grid-template-columns: 1fr 1fr; gap: 1px;
     background: var(--border);
   }
-
   .panel-item {
     background: white;
     padding: 14px 18px;
@@ -439,34 +429,211 @@ const styles = `
     transition: all 0.2s;
     cursor: pointer;
   }
-
-  .panel-item:hover {
-    background: rgba(13,148,136,0.06);
-    color: var(--teal);
-  }
-
+  .panel-item:hover { background: rgba(13,148,136,0.06); color: var(--teal); }
   .panel-item-icon {
     width: 32px; height: 32px; border-radius: 8px;
     display: flex; align-items: center; justify-content: center; font-size: 16px;
     flex-shrink: 0;
   }
-
   .panel-item-text { display: flex; flex-direction: column; }
   .panel-item-label { font-size: 0.83rem; font-weight: 600; }
   .panel-item-sub { font-size: 0.7rem; color: var(--muted); font-weight: 500; }
-
   .panel-footer {
     padding: 12px 18px;
     border-top: 1px solid var(--border);
     display: flex; align-items: center; justify-content: center;
   }
-
   .view-all-link {
     font-size: 0.8rem; font-weight: 700; color: var(--teal);
     text-decoration: none;
     display: flex; align-items: center; gap: 5px;
   }
   .view-all-link:hover { color: var(--teal-dark); }
+
+  .module-card--clickable:hover .module-name { color: var(--teal-light); }
+
+  /* ===== COA SPECIAL PANEL ===== */
+  .coa-panel {
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: all 0.3s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .coa-panel:hover {
+    box-shadow: 0 8px 36px rgba(26,154,146,0.16);
+    border-color: rgba(26,154,146,0.4);
+  }
+
+  .coa-header {
+    padding: 18px 22px;
+    background: linear-gradient(135deg, #1a9a92 0%, #0d7a73 100%);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: space-between;
+    user-select: none;
+    position: relative;
+    overflow: hidden;
+  }
+  .coa-header::before {
+    content: '';
+    position: absolute; top: -40px; right: -40px;
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.07);
+    pointer-events: none;
+  }
+  .coa-header-left { display: flex; align-items: center; gap: 14px; }
+  .coa-hicon {
+    width: 42px; height: 42px;
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(255,255,255,0.28);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    transition: transform 0.2s;
+  }
+  .coa-panel:hover .coa-hicon { transform: scale(1.06); }
+  .coa-title { color: white; font-size: 1.05rem; font-weight: 800; letter-spacing: -0.01em; }
+  .coa-count { color: rgba(255,255,255,0.68); font-size: 0.74rem; font-weight: 500; margin-top: 2px; }
+  .coa-chevron {
+    width: 32px; height: 32px;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.22);
+    border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    color: white;
+    font-size: 11px;
+    transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), background 0.2s;
+    flex-shrink: 0;
+  }
+  .coa-chevron.open {
+    transform: rotate(180deg);
+    background: rgba(255,255,255,0.28);
+  }
+
+  /* Animated submenu */
+  .coa-submenu {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.42s cubic-bezier(0.4,0,0.2,1);
+    background: #fff;
+  }
+  .coa-submenu.open { max-height: 600px; }
+
+  .coa-submenu-inner { padding: 10px 12px 12px; }
+
+  .coa-sub-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 14px;
+    border-radius: 11px;
+    cursor: pointer;
+    transition: background 0.18s, transform 0.2s, border-color 0.18s;
+    margin-bottom: 5px;
+    border: 1.5px solid transparent;
+    text-decoration: none;
+    color: inherit;
+    position: relative;
+    overflow: hidden;
+  }
+  .coa-sub-item:last-child { margin-bottom: 0; }
+
+  .coa-sub-item::before {
+    content: '';
+    position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+    background: #1a9a92;
+    border-radius: 0 3px 3px 0;
+    transform: scaleY(0);
+    transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+    transform-origin: center;
+  }
+  .coa-sub-item:hover::before { transform: scaleY(1); }
+
+  .coa-sub-item:hover {
+    background: #f0faf9;
+    border-color: rgba(26,154,146,0.18);
+    transform: translateX(4px);
+  }
+  .coa-sub-item:active { transform: translateX(2px) scale(0.99); }
+
+  /* Staggered entrance animation when submenu opens */
+  .coa-submenu.open .coa-sub-item {
+    animation: coa-item-in 0.32s ease both;
+  }
+  .coa-submenu.open .coa-sub-item:nth-child(1) { animation-delay: 0.05s; }
+  .coa-submenu.open .coa-sub-item:nth-child(2) { animation-delay: 0.10s; }
+  .coa-submenu.open .coa-sub-item:nth-child(3) { animation-delay: 0.15s; }
+  .coa-submenu.open .coa-sub-item:nth-child(4) { animation-delay: 0.20s; }
+  .coa-submenu.open .coa-sub-item:nth-child(5) { animation-delay: 0.25s; }
+
+  @keyframes coa-item-in {
+    from { opacity: 0; transform: translateX(-8px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+
+  .coa-sub-icon {
+    width: 40px; height: 40px;
+    border-radius: 11px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+    transition: transform 0.22s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .coa-sub-item:hover .coa-sub-icon { transform: scale(1.15) rotate(-3deg); }
+
+  .coa-sub-text { flex: 1; min-width: 0; }
+  .coa-sub-label {
+    font-size: 0.9rem; font-weight: 700;
+    color: #0f2e2c; letter-spacing: -0.01em;
+  }
+  .coa-sub-desc {
+    font-size: 0.72rem; color: #64748b;
+    font-weight: 500; margin-top: 1px;
+  }
+  .coa-sub-badge {
+    font-size: 0.6rem; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    background: rgba(26,154,146,0.1);
+    color: #1a9a92;
+    padding: 2px 8px; border-radius: 20px;
+    border: 1px solid rgba(26,154,146,0.2);
+    flex-shrink: 0;
+    transition: background 0.18s;
+  }
+  .coa-sub-item:hover .coa-sub-badge {
+    background: rgba(26,154,146,0.18);
+  }
+  .coa-sub-arrow {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    background: #f1f5f9;
+    display: flex; align-items: center; justify-content: center;
+    color: #94a3b8; font-size: 12px;
+    flex-shrink: 0;
+    transition: background 0.18s, color 0.18s, transform 0.2s;
+  }
+  .coa-sub-item:hover .coa-sub-arrow {
+    background: #1a9a92; color: white;
+    transform: translateX(3px);
+  }
+
+  .coa-footer {
+    padding: 10px 16px 14px;
+    border-top: 1px solid #f1f5f9;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .coa-view-all {
+    font-size: 0.82rem; font-weight: 700; color: #1a9a92;
+    text-decoration: none;
+    display: flex; align-items: center; gap: 6px;
+    padding: 7px 16px; border-radius: 8px;
+    transition: background 0.18s, color 0.18s;
+    letter-spacing: 0.01em;
+  }
+  .coa-view-all:hover { background: #f0faf9; color: #0d7a73; }
+  .coa-view-all-arrow { transition: transform 0.2s; display: inline-block; }
+  .coa-view-all:hover .coa-view-all-arrow { transform: translateX(4px); }
 
   /* ===== WHY SECTION ===== */
   .why-section {
@@ -661,18 +828,15 @@ const modules = [
   { icon: '📋', name: 'Audit', desc: 'Compliance', bg: 'linear-gradient(135deg,#64748b,#475569)' },
 ];
 
+// COA sub-module items (separate from panelsData)
+const coaSubItems = [
+  { icon: '🗂️', bg: '#d1fae5', label: 'Group', desc: 'Organize account groups', route: 'account-group' },
+  { icon: '📂', bg: '#dbeafe', label: 'Category', desc: 'Account categories', route: 'account-category' },
+  { icon: '🏷️', bg: '#f3e8ff', label: 'Class', desc: 'Classification types', route: 'account-class' },
+  { icon: '📒', bg: '#fef3c7', label: 'Account', desc: 'Individual ledger accounts', route: 'account-account' },
+];
+
 const panelsData = [
-  {
-    icon: '📊', title: 'Chart of Accounts', count: '5 categories',
-    items: [
-      { icon: '🏛️', bg: '#dbeafe', label: 'Assets', sub: 'Cash, property, equipment' },
-      { icon: '📉', bg: '#fee2e2', label: 'Liabilities', sub: 'Loans, payables' },
-      { icon: '💎', bg: '#f3e8ff', label: 'Equity', sub: 'Capital, retained earnings' },
-      { icon: '💵', bg: '#dcfce7', label: 'Income', sub: 'Revenue, sales' },
-      { icon: '🧾', bg: '#fff7ed', label: 'Expenses', sub: 'Costs, overheads' },
-      { icon: '⚙️', bg: '#f1f5f9', label: 'Configure', sub: 'Add custom accounts' },
-    ]
-  },
   {
     icon: '📄', title: 'Vouchers', count: '6 types',
     items: [
@@ -710,10 +874,26 @@ const testimonials = [
   { text: "The real-time dashboard and cash flow reports have been game-changing for our financial decisions. Highly recommended.", name: 'Priya Sharma', role: 'Finance Manager, BuildCraft', init: 'PS' },
 ];
 
-export default function HomePage() {
-  const [openPanels, setOpenPanels] = useState({ 0: true, 1: true, 2: true });
+export default function HomePage({ onNavigate }) {
+  const [openPanels, setOpenPanels] = useState({ 0: true, 1: true });
+  const [coaOpen, setCoaOpen] = useState(false);
 
   const togglePanel = (i) => setOpenPanels(p => ({ ...p, [i]: !p[i] }));
+  const toggleCoa = () => setCoaOpen(v => !v);
+
+  // Module card route map
+  const moduleRoutes = {
+    'Accounting': 'account-group',
+  };
+
+  const handleModuleClick = (name) => {
+    const route = moduleRoutes[name];
+    if (route && onNavigate) onNavigate(route);
+  };
+
+  const handleCoaSubClick = (route) => {
+    if (route && onNavigate) onNavigate(route);
+  };
 
   const bars = [40, 65, 45, 80, 55, 90, 70];
 
@@ -852,12 +1032,22 @@ export default function HomePage() {
         </div>
         <div className="modules-grid">
           {modules.map(m => (
-            <div key={m.name} className="module-card">
+            <div
+              key={m.name}
+              className={`module-card${moduleRoutes[m.name] ? ' module-card--clickable' : ''}`}
+              onClick={() => handleModuleClick(m.name)}
+              title={moduleRoutes[m.name] ? `Open ${m.name}` : undefined}
+            >
               <div className="module-icon-wrap" style={{ background: m.bg }}>
                 <span style={{ fontSize: '28px' }}>{m.icon}</span>
               </div>
               <div className="module-name">{m.name}</div>
               <div className="module-desc">{m.desc}</div>
+              {moduleRoutes[m.name] && (
+                <div style={{ marginTop: '8px', fontSize: '0.65rem', color: 'rgba(13,148,136,0.8)', fontWeight: 700, letterSpacing: '0.05em' }}>
+                  OPEN →
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -873,6 +1063,58 @@ export default function HomePage() {
           <p style={{ color: 'var(--muted)', fontSize: '1rem' }}>Click any category to explore and navigate instantly.</p>
         </div>
         <div className="menu-grid">
+
+          {/* ── COA Panel (special) ── */}
+          <div className="coa-panel">
+            <div className="coa-header" onClick={toggleCoa}>
+              <div className="coa-header-left">
+                <div className="coa-hicon">📊</div>
+                <div>
+                  <div className="coa-title">Chart of Accounts</div>
+                  <div className="coa-count">4 sub-modules</div>
+                </div>
+              </div>
+              <div className={`coa-chevron${coaOpen ? ' open' : ''}`}>▼</div>
+            </div>
+
+            <div className={`coa-submenu${coaOpen ? ' open' : ''}`}>
+              <div className="coa-submenu-inner">
+                {coaSubItems.map((item) => (
+                  <div
+                    key={item.label}
+                    className="coa-sub-item"
+                    onClick={() => handleCoaSubClick(item.route)}
+                    style={{ cursor: item.route ? 'pointer' : 'default' }}
+                  >
+                    <div className="coa-sub-icon" style={{ background: item.bg }}>
+                      {item.icon}
+                    </div>
+                    <div className="coa-sub-text">
+                      <div className="coa-sub-label">{item.label}</div>
+                      <div className="coa-sub-desc">{item.desc}</div>
+                    </div>
+                    {item.route
+                      ? <span className="coa-sub-badge">Open</span>
+                      : <span className="coa-sub-badge" style={{ opacity: 0.45 }}>Soon</span>
+                    }
+                    <div className="coa-sub-arrow">›</div>
+                  </div>
+                ))}
+              </div>
+              <div className="coa-footer">
+                <a
+                  href="#"
+                  className="coa-view-all"
+                  onClick={(e) => { e.preventDefault(); handleCoaSubClick('account-group'); }}
+                >
+                  View all Chart of Accounts
+                  <span className="coa-view-all-arrow">→</span>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* ── Other panels (Vouchers, Reports) ── */}
           {panelsData.map((panel, i) => (
             <div key={i} className="menu-panel">
               <div className="panel-header" onClick={() => togglePanel(i)}>
@@ -889,7 +1131,11 @@ export default function HomePage() {
                 <div className="panel-body">
                   <div className="panel-items-grid">
                     {panel.items.map(item => (
-                      <a key={item.label} href={`#${item.label.toLowerCase().replace(/ /g,'-')}`} className="panel-item">
+                      <a
+                        key={item.label}
+                        href={`#${item.label.toLowerCase().replace(/ /g,'-')}`}
+                        className="panel-item"
+                      >
                         <div className="panel-item-icon" style={{ background: item.bg }}>{item.icon}</div>
                         <div className="panel-item-text">
                           <span className="panel-item-label">{item.label}</span>
