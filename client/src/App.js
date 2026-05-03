@@ -4,6 +4,7 @@ import Accountgroup    from './COA/Accountgroup';
 import Accountcategory from './COA/Accountcategory';
 import Accountclass    from './COA/Accountclass';
 import Accountaccount  from './COA/Accountaccount';
+import TemplatesPage   from './templates/TemplatesPage';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
@@ -18,6 +19,7 @@ function App() {
       {currentPage === 'account-category' && <Accountcategory onBack={goHome} />}
       {currentPage === 'account-class'    && <Accountclass    onBack={goHome} />}
       {currentPage === 'account-account'  && <Accountaccount  onBack={goHome} />}
+      {currentPage === 'templates'        && <TemplatesPage   onBack={goHome} />}
     </div>
   );
 }
