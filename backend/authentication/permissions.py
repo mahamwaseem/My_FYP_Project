@@ -1,25 +1,13 @@
 from rest_framework import permissions
 
-class IsAdministrator(permissions.BasePermission):
+class IsAdmin(permissions.BasePermission):
     def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.groups.filter(name='Administrator').exists()
-
-class IsManager(permissions.BasePermission):
-    def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.groups.filter(name='Manager').exists()
+        return request.user.is_authenticated and request.user.role == 'admin'
 
 class IsAccountant(permissions.BasePermission):
     def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.groups.filter(name='Accountant').exists()
+        return request.user.is_authenticated and request.user.role == 'accountant'
 
-class IsAdministratorOrManager(permissions.BasePermission):
+class IsUser(permissions.BasePermission):
     def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.groups.filter(name__in=['Administrator', 'Manager']).exists()
-
-class IsAdministratorOrAccountant(permissions.BasePermission):
-    def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.groups.filter(name__in=['Administrator', 'Accountant']).exists()
-
-class IsAnyRole(permissions.BasePermission):
-    def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.groups.filter(name__in=['Administrator', 'Manager', 'Accountant', 'Viewer']).exists()
+        return request.user.is_authenticated and request.user.role == 'user'

@@ -3,42 +3,35 @@ from django.contrib.auth.models import Group
 from .models import User  # Custom User model
 
 class RegisterSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, min_length=8)
-    role = serializers.CharField(required=False)
+    password = serializers.CharField(write_only=True, min_length=6)
+    confirm_password = serializers.CharField(write_only=True, min_length=6)
 
     class Meta:
         model = User
-        fields = ('username', 'password', 'email', 'role', 'first_name', 'last_name')
+        fields = ('name', 'email', 'password', 'confirm_password')
+
+    def validate_email(self, value):
+        if User.objects.filter(email=value).exists():
+            raise serializers.ValidationError("Email already exists.")
+        return value
+
+    def validate(self, data):
+        if data['password'] != data['confirm_password']:
+            raise serializers.ValidationError({"confirm_password": "Passwords do not match."})
+        return data
 
     def create(self, validated_data):
-        # Default to 'Viewer' if no role is provided
-        requested_role = validated_data.pop('role', 'Viewer')
-
-        # Security: Prevent self-assignment of 'Administrator' or 'Manager'
-        if requested_role in ['Administrator', 'Manager']:
-            role_to_assign = 'Viewer'
-        else:
-            role_to_assign = requested_role
-
+        validated_data.pop('confirm_password')
         user = User.objects.create_user(
-            username=validated_data['username'],
-            email=validated_data.get('email'),
+            name=validated_data['name'],
+            email=validated_data['email'],
             password=validated_data['password'],
-            first_name=validated_data.get('first_name', ''),
-            last_name=validated_data.get('last_name', '')
+            role='user'
         )
-        
-        # Assign to Django Group in SQL Server
-        try:
-            group = Group.objects.get(name=role_to_assign)
-            user.groups.add(group)
-        except Group.DoesNotExist:
-            pass
-            
         return user
 
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'phone', 'role', 'first_name', 'last_name']
-        read_only_fields = ['role']
+        fields = ['id', 'name', 'email', 'role', 'created_at']
+        read_only_fields = ['role', 'created_at']
