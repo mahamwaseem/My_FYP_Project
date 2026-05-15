@@ -1,0 +1,147 @@
+// FinTrack Custom Hooks
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { voucherAPI, currencyAPI } from '../services/api';
+
+// ── useToast ─────────────────────────────────────────────────────────────────
+let toastListeners = [];
+export function emitToast(toast) {
+  toastListeners.forEach((fn) => fn(toast));
+}
+
+export function useToastStore() {
+  const [toasts, setToasts] = useState([]);
+  useEffect(() => {
+    const handler = (toast) => {
+      const id = Date.now() + Math.random();
+      setToasts((prev) => [...prev, { ...toast, id }]);
+      setTimeout(() => {
+        setToasts((prev) => prev.filter((t) => t.id !== id));
+      }, toast.duration || 4000);
+    };
+    toastListeners.push(handler);
+    return () => { toastListeners = toastListeners.filter((fn) => fn !== handler); };
+  }, []);
+  return { toasts };
+}
+
+export function useToast() {
+  return {
+    success: (message, title = 'Success') => emitToast({ type: 'success', title, message }),
+    error:   (message, title = 'Error')   => emitToast({ type: 'error',   title, message }),
+    info:    (message, title = 'Info')    => emitToast({ type: 'info',    title, message }),
+    warning: (message, title = 'Warning') => emitToast({ type: 'warning', title, message }),
+  };
+}
+
+// ── useVouchers ───────────────────────────────────────────────────────────────
+export function useVouchers(params = {}) {
+  const [vouchers, setVouchers] = useState([]);
+  const [loading, setLoading]   = useState(true);
+  const [error, setError]       = useState(null);
+  const paramsRef = useRef(params);
+  paramsRef.current = params;
+
+  const fetch = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await voucherAPI.list(paramsRef.current);
+      setVouchers(res.data || res.results || res || []);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { fetch(); }, [fetch]);
+  return { vouchers, loading, error, refetch: fetch };
+}
+
+// ── useVoucher (single) ───────────────────────────────────────────────────────
+export function useVoucher(id) {
+  const [voucher, setVoucher] = useState(null);
+  const [loading, setLoading] = useState(!!id);
+  const [error, setError]     = useState(null);
+
+  const fetch = useCallback(async () => {
+    if (!id) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await voucherAPI.get(id);
+      setVoucher(res.data || res);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [id]);
+
+  useEffect(() => { fetch(); }, [fetch]);
+  return { voucher, loading, error, refetch: fetch };
+}
+
+// ── useSummary ────────────────────────────────────────────────────────────────
+export function useSummary() {
+  const [summary, setSummary] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError]     = useState(null);
+
+  const fetch = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await voucherAPI.summary();
+      setSummary(res.data || res);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { fetch(); }, [fetch]);
+  return { summary, loading, error, refetch: fetch };
+}
+
+// ── useCurrencies ─────────────────────────────────────────────────────────────
+export function useCurrencies() {
+  const [currencies, setCurrencies] = useState([]);
+  const [loading, setLoading]       = useState(true);
+
+  useEffect(() => {
+    currencyAPI.list()
+      .then((res) => setCurrencies(res.data || res.results || res || []))
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  return { currencies, loading };
+}
+
+// ── useAuditLog ───────────────────────────────────────────────────────────────
+export function useAuditLog(voucherId) {
+  const [logs, setLogs]       = useState([]);
+  const [loading, setLoading] = useState(!!voucherId);
+
+  useEffect(() => {
+    if (!voucherId) return;
+    setLoading(true);
+    voucherAPI.audit(voucherId)
+      .then((res) => setLogs(res.data || res || []))
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [voucherId]);
+
+  return { logs, loading };
+}
+
+// ── useDebounce ───────────────────────────────────────────────────────────────
+export function useDebounce(value, delay = 400) {
+  const [debounced, setDebounced] = useState(value);
+  useEffect(() => {
+    const timer = setTimeout(() => setDebounced(value), delay);
+    return () => clearTimeout(timer);
+  }, [value, delay]);
+  return debounced;
+}
