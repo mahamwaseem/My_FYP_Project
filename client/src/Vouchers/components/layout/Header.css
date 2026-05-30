@@ -1,0 +1,48 @@
+/* Header Component Styles */
+.top-header {
+  height: var(--header-height);
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-light);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 24px; gap: 16px;
+  position: sticky; top: 0; z-index: 30;
+  box-shadow: var(--shadow-sm);
+}
+
+.header-left {
+  display: flex; align-items: center; gap: 12px;
+  min-width: 0;
+}
+
+.header-menu-btn {
+  display: none; flex-direction: column; gap: 4px;
+  background: none; border: none; cursor: pointer;
+  padding: 4px; border-radius: var(--radius-sm);
+  flex-shrink: 0;
+}
+.header-menu-btn span {
+  display: block; width: 18px; height: 2px;
+  background: var(--text-secondary); border-radius: 2px;
+  transition: all var(--transition-fast);
+}
+.header-menu-btn:hover span { background: var(--text-primary); }
+
+.header-title-group { min-width: 0; }
+.header-title {
+  font-size: 1rem; font-weight: 600;
+  color: var(--text-primary); white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis;
+}
+.header-subtitle {
+  font-size: 0.75rem; color: var(--text-muted);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.header-right {
+  display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .header-menu-btn { display: flex; }
+  .top-header { padding: 0 16px; }
+}

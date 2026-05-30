@@ -1,0 +1,54 @@
+/* Account Ledger Styles */
+.ledger-controls {
+  display: flex; align-items: flex-end; gap: 14px;
+  padding: 18px 20px; flex-wrap: wrap;
+}
+.ledger-account-picker { flex: 1; min-width: 260px; }
+.ledger-controls .form-group { min-width: 150px; }
+.ledger-presets {
+  display: flex; gap: 4px; flex-wrap: wrap; padding-bottom: 1px;
+}
+
+/* Summary panel */
+.ledger-summary {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  margin-top: 16px; overflow: hidden;
+}
+.ledger-summary-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px; border-bottom: 1px solid var(--border-light);
+  gap: 12px; flex-wrap: wrap;
+}
+.ledger-acc-code { font-size: 0.82em; color: var(--text-muted); letter-spacing: 0.04em; }
+.ledger-acc-name { font-size: 1.25em; font-weight: 700; letter-spacing: -0.01em; }
+
+.ledger-summary-stats {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+}
+.lss-item {
+  display: flex; flex-direction: column; gap: 5px;
+  padding: 16px 20px; border-right: 1px solid var(--border-light);
+}
+.lss-item:last-child { border-right: none; }
+.lss-label { font-size: 0.76em; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-muted); }
+.lss-value { font-size: 1.2em; font-weight: 700; font-family: var(--font-mono); }
+.lss-closing { background: var(--teal-50); }
+.lss-closing .lss-value { color: var(--teal-800); }
+
+@media (max-width: 768px) {
+  .ledger-summary-stats { grid-template-columns: repeat(2, 1fr); }
+  .lss-item:nth-child(2) { border-right: none; }
+}
+
+/* Ledger table */
+.ledger-table .opening-row {
+  background: var(--bg-muted); color: var(--text-secondary);
+}
+.ledger-table .opening-row em { font-style: normal; font-weight: 500; }
+.ledger-voucher-no { color: var(--teal-700); font-weight: 500; }
+.ledger-table .particulars { color: var(--text-secondary); max-width: 320px; }
+.ledger-table .ref-cell { color: var(--text-muted); font-size: 0.9em; }
+.balance-figure { font-weight: 700; color: var(--text-primary); }

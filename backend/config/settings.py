@@ -6,7 +6,6 @@ SECRET_KEY = 'django-insecure-dge)leqr-*s#9)#nc)j0=p^+e)3k#h2)@pqphi^u!6*ce=0kj2
 
 DEBUG = True
 
-# ✅ FIX 1: Allow all hosts in development
 ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
@@ -16,17 +15,27 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # 3rd Party
     'rest_framework',
     'corsheaders',
-    'accounts',
+    'django_filters',
+
+    # Project Apps
+    'accounts',         # Chart of Accounts module
+    'vouchers',         # Voucher management module
+    'general_ledger',   # General Ledger module
+    'reports',          # Financial Statements & Reports module
+    'templates',        # Voucher Templates module
+    'reporting',        # Reporting module (operational + custom reports)
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',  # ✅ Must be FIRST
+    'corsheaders.middleware.CorsMiddleware',  # Must be FIRST
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    # ✅ FIX 2: CSRF disabled for API (React sends JSON, not forms)
+    # CSRF disabled — React sends JSON, not HTML forms
     # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -53,21 +62,23 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 
 
-# ✅ FIX 3: SQL Server database config (mssql-django)
+# ── Database (SQL Server via mssql-django) ────────────────────────
+# All modules share this one database.
+# Change HOST to your SSMS server name.
 DATABASES = {
     'default': {
         'ENGINE': 'mssql',
         'NAME': 'fintrack_db',
-        'HOST': 'localhost',
+        'USER': '',
+        'PASSWORD': '',
+        'HOST': r'DESKTOP-8BL3MIG\SQLEXPRESS',
         'PORT': '',
         'OPTIONS': {
             'driver': 'ODBC Driver 17 for SQL Server',
             'trusted_connection': 'yes',
         },
-    },
+    }
 }
-
-
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -84,42 +95,37 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# ✅ FIX 4: CORS - Allow React to talk to Django
-CORS_ALLOW_ALL_ORIGINS = True          # Allow all origins in development
+
+# ── CORS ──────────────────────────────────────────────────────────
+CORS_ALLOW_ALL_ORIGINS = True       # dev only — restrict in production
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
 ]
-CORS_ALLOW_METHODS = [
-    'DELETE',
-    'GET',
-    'OPTIONS',
-    'PATCH',
-    'POST',
-    'PUT',
-]
+CORS_ALLOW_METHODS = ['DELETE', 'GET', 'OPTIONS', 'PATCH', 'POST', 'PUT']
 CORS_ALLOW_HEADERS = [
-    'accept',
-    'accept-encoding',
-    'authorization',
-    'content-type',
-    'dnt',
-    'origin',
-    'user-agent',
-    'x-csrftoken',
-    'x-requested-with',
+    'accept', 'accept-encoding', 'authorization', 'content-type',
+    'dnt', 'origin', 'user-agent', 'x-csrftoken', 'x-requested-with',
 ]
 
-# ✅ FIX 5: REST Framework config
+
+# ── REST Framework ────────────────────────────────────────────────
 REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend',
+        'rest_framework.filters.SearchFilter',
+        'rest_framework.filters.OrderingFilter',
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 20,
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
     ],
     'DEFAULT_PARSER_CLASSES': [
         'rest_framework.parsers.JSONParser',
     ],
-    # No authentication required for now
     'DEFAULT_AUTHENTICATION_CLASSES': [],
     'DEFAULT_PERMISSION_CLASSES': [],
 }

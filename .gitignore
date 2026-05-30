@@ -1,0 +1,33 @@
+﻿# Python / Django
+__pycache__/
+*.pyc
+*.pyo
+venv/
+env/
+*.sqlite3
+db.sqlite3
+
+# Node / React
+node_modules/
+build/
+dist/
+.env
+.cache/
+
+# Zips & temp files
+*.zip
+temp_*.py
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Delivery zip-folders (duplicates of real apps - not loaded by Django)
+backend/financial_statements_backend/
+backend/general_ledger_backend/
+backend/voucher_templates_backend/

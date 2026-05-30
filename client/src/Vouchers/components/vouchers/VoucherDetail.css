@@ -1,0 +1,38 @@
+/* Voucher Detail Styles */
+.voucher-meta-row {
+  display: flex; flex-wrap: wrap; gap: 16px;
+  padding: 12px 14px; background: var(--bg-muted);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-light);
+  margin-bottom: 4px;
+}
+.meta-item { display: flex; flex-direction: column; gap: 2px; }
+.meta-label { font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); }
+.meta-value { font-size: 0.875rem; font-weight: 500; color: var(--text-primary); }
+
+/* Tabs */
+.detail-tabs {
+  display: flex; gap: 0;
+  margin: 16px 0 12px;
+  border-bottom: 2px solid var(--border-light);
+}
+.tab-btn {
+  padding: 7px 16px; border: none; background: none; cursor: pointer;
+  font-family: var(--font-sans); font-size: 0.875rem; font-weight: 500;
+  color: var(--text-muted); border-bottom: 2px solid transparent;
+  margin-bottom: -2px; transition: all var(--transition-fast);
+}
+.tab-btn:hover { color: var(--text-secondary); }
+.tab-btn.active { color: var(--teal-600); border-bottom-color: var(--teal-600); }
+
+/* Audit */
+.audit-list { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+.audit-item {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+  padding: 8px 12px; background: var(--bg-muted);
+  border-radius: var(--radius-md); border-left: 3px solid var(--teal-400);
+  font-size: 0.8125rem;
+}
+.audit-action { font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; font-size: 0.75rem; color: var(--teal-700); }
+.audit-meta   { color: var(--text-muted); font-family: var(--font-mono); font-size: 0.75rem; }
+.audit-notes  { color: var(--text-secondary); width: 100%; }

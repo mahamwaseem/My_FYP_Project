@@ -1,5 +1,24 @@
+/* Global width/overflow guard — applies to every page, not just the homepage.
+   Kills the right-edge sliver / horizontal scroll regardless of which module renders. */
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  scroll-padding-top: 92px;
+}
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 .App {
-  text-align: center;
+  text-align: left;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  padding-top: 72px;
+  min-height: 100vh;
 }
 
 .App-logo {

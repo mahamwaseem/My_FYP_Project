@@ -1,0 +1,228 @@
+/* =================================================================
+   FinTrack — Navbar (light theme)
+   ================================================================= */
+.ftn {
+  position: fixed; inset: 0 0 auto 0; z-index: 1000;
+  height: 72px; width: 100%;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.06);
+  transition: height .28s ease, background .28s ease, border-color .28s ease, box-shadow .28s ease;
+}
+.ftn--scrolled {
+  height: 66px;
+  background: rgba(255, 255, 255, 1);
+  border-bottom-color: rgba(15, 23, 42, 0.12);
+  box-shadow: 0 18px 42px rgba(15, 23, 42, 0.08);
+}
+
+.ftn-inner {
+  height: 100%;
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 0 28px 0 56px;
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+/* Brand — pinned left, pushes everything else to the right */
+.ftn-logo {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  text-decoration: none;
+  flex-shrink: 0;
+  margin-right: auto;          /* ← shifts links + actions to the right */
+}
+.ftn-logo-mark {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #14b8a6, #0f766e);
+  color: #fff;
+  font-family: 'Sora', sans-serif;
+  font-weight: 800;
+  font-size: 1.15rem;
+  box-shadow: 0 10px 30px rgba(13, 148, 136, 0.24);
+}
+.ftn-logo-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+.ftn-logo-name {
+  font-family: 'Sora', sans-serif;
+  font-weight: 800;
+  font-size: 1.06rem;
+  color: #102a43;
+  letter-spacing: -.01em;
+}
+.ftn-logo-sub {
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+/* Links — sit on the right, before the actions */
+.ftn-links {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.ftn-link {
+  position: relative;
+  cursor: pointer;
+  text-decoration: none;
+  color: #334155;
+  font-size: .92rem;
+  font-weight: 700;
+  padding: 12px 18px;
+  border-radius: 16px;
+  background: rgba(248, 250, 252, 0.95);
+  border: 1px solid transparent;
+  white-space: nowrap;
+  transition: color .2s ease, background .2s ease, transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+}
+.ftn-link:hover {
+  color: #0f766e;
+  background: rgba(14, 165, 233, 0.14);
+  border-color: rgba(14, 165, 233, 0.18);
+  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.08);
+  transform: translateY(-1px);
+}
+.ftn-link.active {
+  color: #0f766e;
+  background: rgba(20, 184, 166, 0.18);
+  border-color: rgba(20, 184, 166, 0.24);
+}
+.ftn-link.active::after {
+  content: '';
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 4px;
+  height: 3px;
+  border-radius: 999px;
+  background: #14b8a6;
+}
+
+/* Actions — search + beautiful Sign in */
+.ftn-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+  padding-left: 10px;
+  border-left: 1px solid rgba(15, 23, 42, 0.08);
+}
+.ftn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(20, 184, 166, 0.22);
+  background: rgba(20, 184, 166, 0.08);
+  color: #0f766e;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .2s ease, transform .2s ease, border-color .2s ease;
+}
+.ftn-back:hover {
+  background: rgba(20, 184, 166, 0.16);
+  transform: translateY(-1px);
+}
+.ftn-back svg {
+  width: 16px;
+  height: 16px;
+}
+.ftn-search {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  background: #fff;
+  color: #334155;
+  border: 1px solid #d1d5db;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: border-color .2s ease, color .2s ease, box-shadow .2s ease, transform .2s ease;
+}
+.ftn-search:hover {
+  color: #0f766e;
+  border-color: #a7f3d0;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.09);
+  transform: translateY(-1px);
+}
+
+/* Beautiful Sign-in button */
+.ftn-btn-signup {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #14b8a6 0%, #0f766e 100%);
+  color: #fff;
+  border: none;
+  padding: 11px 22px;
+  border-radius: 12px;
+  font-family: 'Sora', system-ui, sans-serif;
+  font-size: .9rem;
+  font-weight: 700;
+  letter-spacing: .01em;
+  cursor: pointer;
+  box-shadow: 0 8px 22px rgba(13, 148, 136, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.ftn-btn-signup svg { transition: transform .25s ease; }
+.ftn-btn-signup::before {            /* sheen sweep on hover */
+  content: '';
+  position: absolute; top: 0; left: -120%;
+  width: 80%; height: 100%;
+  background: linear-gradient(100deg, transparent, rgba(255,255,255,0.45), transparent);
+  transform: skewX(-18deg);
+  transition: left .55s ease;
+}
+.ftn-btn-signup:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 32px rgba(13, 148, 136, 0.44), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+.ftn-btn-signup:hover::before { left: 130%; }
+.ftn-btn-signup:hover svg { transform: translateX(3px); }
+.ftn-btn-signup:active { transform: translateY(0); }
+
+/* Hamburger */
+.ftn-burger { display: none; flex-direction: column; gap: 5px; background: none; border: none; cursor: pointer; padding: 8px; }
+.ftn-burger span { width: 22px; height: 2px; border-radius: 2px; background: #0f766e; transition: transform .3s ease, opacity .3s ease; }
+.ftn-burger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.ftn-burger.open span:nth-child(2) { opacity: 0; }
+.ftn-burger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* Responsive */
+@media (max-width: 1040px) {
+  .ftn-inner { padding: 0 20px; gap: 14px; }
+  .ftn-burger { display: flex; }
+  .ftn-search { display: none; }
+  .ftn-actions { border-left: none; padding-left: 0; }
+  .ftn-links {
+    position: fixed; top: 66px; left: 0; right: 0; margin: 0;
+    flex-direction: column; align-items: stretch; gap: 2px;
+    background: #fff; padding: 14px; box-shadow: 0 16px 32px rgba(15, 23, 42, 0.12);
+    transform: translateY(-135%); opacity: 0; pointer-events: none;
+    transition: transform .32s cubic-bezier(.4,0,.2,1), opacity .3s ease;
+  }
+  .ftn-links.open { transform: translateY(0); opacity: 1; pointer-events: auto; }
+  .ftn-link { padding: 13px 14px; }
+}
+@media (max-width: 520px) {
+  .ftn-logo-sub { display: none; }
+  .ftn-btn-signup { padding: 10px 16px; font-size: .84rem; }
+}
