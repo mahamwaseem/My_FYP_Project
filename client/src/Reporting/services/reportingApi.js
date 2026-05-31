@@ -13,6 +13,10 @@ const BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
 
 async function request(endpoint, options = {}) {
   const headers = { 'Content-Type': 'application/json', ...options.headers };
+  // Attach the auth token so the backend knows the user (needed for the
+  // admin-only Audit Trail report).
+  const token = localStorage.getItem('fintrack_access');
+  if (token) headers.Authorization = `Bearer ${token}`;
   const response = await fetch(`${BASE_URL}${endpoint}`, { ...options, headers });
   const ct = response.headers.get('content-type');
   const data = ct && ct.includes('application/json') ? await response.json() : await response.text();

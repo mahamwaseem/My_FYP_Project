@@ -21,6 +21,15 @@ from vouchers.models import (
     RecurringSchedule,
 )
 
+# Role-based access control: everyone reads; only admin + accountant may
+# create/edit/delete templates or apply them (apply creates a voucher).
+from users.auth import JWTUserAuthentication
+from users.permissions import ReadOnlyOrAccounting
+
+# Central system-wide audit trail.
+from audit.services import record as audit_record
+from audit.models import AuditAction
+
 
 def _error(message, code=status.HTTP_400_BAD_REQUEST):
     return Response({"success": False, "detail": str(message)}, status=code)
@@ -36,6 +45,8 @@ class VoucherTemplateViewSet(viewsets.ModelViewSet):
       GET/PATCH/DELETE   /api/templates/{id}/
       POST               /api/templates/{id}/apply/   → create (+post) a voucher
     """
+    authentication_classes = [JWTUserAuthentication]
+    permission_classes = [ReadOnlyOrAccounting]
     serializer_class = VoucherTemplateSerializer
     filter_backends  = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['v_type', 'is_recurring', 'is_active']
@@ -137,6 +148,12 @@ class VoucherTemplateViewSet(viewsets.ModelViewSet):
         # return the created voucher via the vouchers read serializer
         from vouchers.serializers import VoucherHeaderReadSerializer
         data = VoucherHeaderReadSerializer(voucher).data
+        audit_record(
+            AuditAction.APPLIED, 'voucher', request=request,
+            entity_id=voucher.id, entity_label=voucher.voucher_no,
+            note=f"Created from template “{template.name}”"
+                 + (" and posted." if do_post else " (draft)."),
+        )
         return _ok({
             'voucher': data,
             'voucher_no': voucher.voucher_no,

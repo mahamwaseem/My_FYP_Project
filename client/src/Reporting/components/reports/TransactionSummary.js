@@ -6,7 +6,7 @@ export default function TransactionSummary({ data, loading, dateFrom, dateTo }) 
   return (
     <ReportSheet id="rp-printable" kicker="Transaction Summary"
                  asOf={`${prettyDate(dateFrom)} — ${prettyDate(dateTo)}`}>
-      {(!loading && data) && (
+      {(!loading && data && Array.isArray(data.rows)) && (
         <div className="rp-statline">
           <span><b>{data.voucher_count}</b> vouchers</span>
           <span><b>{data.transaction_count}</b> postings</span>
@@ -24,7 +24,7 @@ export default function TransactionSummary({ data, loading, dateFrom, dateTo }) 
             <th className="num">Entries</th>
           </tr>
         </thead>
-        {(loading || !data) ? <SkeletonRows cols={7} /> : (
+        {(loading || !data || !Array.isArray(data.rows)) ? <SkeletonRows cols={7} /> : (
           <tbody>
             {data.rows.map((r, i) => (
               <tr key={r.code} style={{ animationDelay: `${i * 40}ms` }}>
@@ -39,7 +39,7 @@ export default function TransactionSummary({ data, loading, dateFrom, dateTo }) 
             ))}
           </tbody>
         )}
-        {(!loading && data) && (
+        {(!loading && data && Array.isArray(data.rows)) && (
           <tfoot>
             <tr>
               <td colSpan={3}>Totals</td>

@@ -7,6 +7,10 @@ async function request(endpoint, options = {}) {
     'Content-Type': 'application/json',
     ...options.headers,
   };
+  // Attach the FinTrack auth token (stored by the Auth module) so writes
+  // (create / post / reverse / delete) pass the backend's RBAC checks.
+  const token = localStorage.getItem('fintrack_access');
+  if (token) headers.Authorization = `Bearer ${token}`;
 
   const config = { ...options, headers };
   const response = await fetch(`${BASE_URL}${endpoint}`, config);

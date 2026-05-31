@@ -105,9 +105,16 @@ export function useApplyTemplate() {
       const res = await templatesAPI.apply(template.id, payload);
       return { ok: true, demo: false, data: unwrap(res), payload };
     } catch (e) {
-      // DEMO FALLBACK — simulate a created voucher so the flow is demonstrable.
-      const fakeNo = `${template.type}-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 90000) + 10000)}`;
-      return { ok: true, demo: true, data: { voucher_no: fakeNo, ...payload }, payload };
+      // Real failure — report it honestly (e.g. 403 = no permission). Never
+      // fake a success: the voucher was NOT created.
+      const status = e && e.status;
+      let message = (e && (e.data?.detail || e.data?.message || e.message)) || 'Could not create the voucher.';
+      if (status === 403) {
+        message = "You don't have permission to create vouchers. This action requires an Accountant or Administrator role.";
+      } else if (status === 401) {
+        message = 'Your session has expired. Please sign in again.';
+      }
+      return { ok: false, demo: false, error: message, status, payload };
     } finally {
       setSubmitting(false);
     }

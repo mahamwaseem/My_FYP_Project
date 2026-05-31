@@ -14,6 +14,10 @@ const BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
 
 async function request(endpoint, options = {}) {
   const headers = { 'Content-Type': 'application/json', ...options.headers };
+  // Attach the FinTrack auth token (stored by the Auth module) so writes
+  // (e.g. applying a template → creating a voucher) pass the backend's RBAC.
+  const token = localStorage.getItem('fintrack_access');
+  if (token) headers.Authorization = `Bearer ${token}`;
   const config = { ...options, headers };
   const response = await fetch(`${BASE_URL}${endpoint}`, config);
 

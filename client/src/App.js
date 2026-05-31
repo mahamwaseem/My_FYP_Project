@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './App.css';
+import { AuthProvider, RequireAuth, AdminUsers, PERMISSIONS } from './Auth';
 import HomePage from './HomePage';
 import Navbar from './Navbar';
 import Accountgroup    from './COA/Accountgroup';
@@ -43,20 +44,54 @@ function App() {
   };
 
   return (
-    <div className="App">
-      <Navbar onNavigate={navigate} active={currentPage} onBack={goBack} canGoBack={currentPage !== 'home'} />
-      {currentPage === 'home'             && <HomePage        onNavigate={navigate} />}
-      {currentPage === 'account-group'    && <Accountgroup    onBack={goHome} />}
-      {currentPage === 'account-category' && <Accountcategory onBack={goHome} />}
-      {currentPage === 'account-class'    && <Accountclass    onBack={goHome} />}
-      {currentPage === 'account-account'  && <Accountaccount  onBack={goHome} />}
-      {currentPage === 'vouchers'         && <VouchersPage    onBack={goHome} onAppNavigate={navigate} />}
-      {currentPage === 'templates'        && <TemplatesPage   onBack={goHome} />}
-      {currentPage === 'general-ledger'   && <GeneralLedgerPage onBack={goHome} onAppNavigate={navigate} />}
-      {currentPage === 'reports'          && <FinancialStatementsPage onBack={goHome} />}
-      {currentPage === 'reporting' && <ReportingPage onBack={goHome} />}
+    // AuthProvider supplies auth context to the whole app (so Navbar/buttons can
+    // read it) WITHOUT gating it. The public homepage renders freely; each real
+    // module is wrapped in <RequireAuth> so opening it triggers the login screen
+    // when not signed in. Role permissions still govern access inside.
+    <AuthProvider>
+      <div className="App">
+        <Navbar onNavigate={navigate} active={currentPage} onBack={goBack} canGoBack={currentPage !== 'home'} />
 
-    </div>
+        {/* PUBLIC — landing page, no login required */}
+        {currentPage === 'home' && <HomePage onNavigate={navigate} />}
+
+        {/* GATED — every real module requires login (no token = login screen) */}
+        {currentPage === 'account-group' && (
+          <RequireAuth onBack={goHome}><Accountgroup onBack={goHome} /></RequireAuth>
+        )}
+        {currentPage === 'account-category' && (
+          <RequireAuth onBack={goHome}><Accountcategory onBack={goHome} /></RequireAuth>
+        )}
+        {currentPage === 'account-class' && (
+          <RequireAuth onBack={goHome}><Accountclass onBack={goHome} /></RequireAuth>
+        )}
+        {currentPage === 'account-account' && (
+          <RequireAuth onBack={goHome}><Accountaccount onBack={goHome} /></RequireAuth>
+        )}
+        {currentPage === 'vouchers' && (
+          <RequireAuth onBack={goHome}><VouchersPage onBack={goHome} onAppNavigate={navigate} /></RequireAuth>
+        )}
+        {currentPage === 'templates' && (
+          <RequireAuth onBack={goHome}><TemplatesPage onBack={goHome} /></RequireAuth>
+        )}
+        {currentPage === 'general-ledger' && (
+          <RequireAuth onBack={goHome}><GeneralLedgerPage onBack={goHome} onAppNavigate={navigate} /></RequireAuth>
+        )}
+        {currentPage === 'reports' && (
+          <RequireAuth onBack={goHome}><FinancialStatementsPage onBack={goHome} /></RequireAuth>
+        )}
+        {currentPage === 'reporting' && (
+          <RequireAuth onBack={goHome}><ReportingPage onBack={goHome} /></RequireAuth>
+        )}
+
+        {/* Roles & Access — requires login AND admin permission */}
+        {currentPage === 'users' && (
+          <RequireAuth perm={PERMISSIONS.MANAGE_USERS} onBack={goHome}>
+            <AdminUsers onBack={goHome} />
+          </RequireAuth>
+        )}
+      </div>
+    </AuthProvider>
   );
 }
 

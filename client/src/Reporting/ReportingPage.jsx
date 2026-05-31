@@ -4,6 +4,7 @@ import './styles/reporting.css';
 import { REPORTS, ACCOUNTS, COMPANY } from './services/mockData';
 import { useReport, useToast, toCSV } from './hooks/useReporting';
 import { resolvePeriod, downloadCSV, printElement, todayISO } from './utils/reportHelpers';
+import { useAuth } from '../Auth';
 
 import ToastContainer from './components/shared/Toast';
 import Icon from './components/shared/Icon';
@@ -17,12 +18,26 @@ const PERIODS = ['monthly', 'quarterly', 'annually'];
 
 export default function ReportingPage({ onBack }) {
   const toast = useToast();
+  const { role } = useAuth();
+  const isAdmin = role === 'admin';
+
+  // Audit Trail is admin-only — hide it from the report picker for everyone else.
+  const visibleReports = useMemo(
+    () => REPORTS.filter((r) => r.id !== 'audit' || isAdmin),
+    [isAdmin]
+  );
+
   const [reportId, setReportId] = useState('balances');
   const [period, setPeriod] = useState('monthly');
   const [range, setRange] = useState(() => resolvePeriod('monthly'));
   const [accountName, setAccountName] = useState(ACCOUNTS[0].name);
   const [exportOpen, setExportOpen] = useState(false);
   const exportRef = useRef(null);
+
+  // safety: if a non-admin somehow has 'audit' selected, bounce to balances
+  useEffect(() => {
+    if (reportId === 'audit' && !isAdmin) setReportId('balances');
+  }, [reportId, isAdmin]);
 
   const meta = REPORTS.find((r) => r.id === reportId);
 
@@ -90,7 +105,7 @@ export default function ReportingPage({ onBack }) {
           </div>
 
           <nav className="rp-types">
-            {REPORTS.map((r) => (
+            {visibleReports.map((r) => (
               <button key={r.id} className={`rp-type${reportId === r.id ? ' on' : ''}`} onClick={() => setReportId(r.id)}>
                 <span className="rp-type-ic"><Icon name={r.icon} size={18} /></span>
                 <span className="rp-type-body">

@@ -15,7 +15,7 @@ export default function AccountBalances({ data, loading, asOf }) {
             <th className="side">Dr/Cr</th>
           </tr>
         </thead>
-        {(loading || !data) ? <SkeletonRows cols={5} /> : (
+        {(loading || !data || !Array.isArray(data.rows)) ? <SkeletonRows cols={5} /> : (
           <tbody>
             {data.rows.map((r, i) => (
               <tr key={r.code} style={{ animationDelay: `${i * 40}ms` }}>
@@ -28,7 +28,7 @@ export default function AccountBalances({ data, loading, asOf }) {
             ))}
           </tbody>
         )}
-        {(!loading && data) && (
+        {(!loading && data && Array.isArray(data.rows)) && (
           <tfoot>
             <tr>
               <td colSpan={3}>Total Debits · Total Credits</td>

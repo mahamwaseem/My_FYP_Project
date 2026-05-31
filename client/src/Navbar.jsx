@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './Navbar.css';
+import { UserMenu, useAuth } from './Auth';
 
 /**
  * FinTrack — top navigation bar (light theme).
@@ -21,6 +22,7 @@ const NAV_LINKS = [
 export default function Navbar({ onNavigate, active, onBack, canGoBack }) {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 6);
@@ -79,13 +81,21 @@ export default function Navbar({ onNavigate, active, onBack, canGoBack }) {
               <circle cx="11" cy="11" r="7" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
             </svg>
           </button>
-          <button className="ftn-btn-signup" onClick={() => go('login')}>
-            <span>Sign in</span>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                 strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" />
-            </svg>
-          </button>
+
+          {/* When signed in → user menu (avatar · role · logout · admin link).
+              When not signed in → Sign in button. */}
+          {isAuthenticated ? (
+            <UserMenu onManageUsers={() => go('users')} />
+          ) : (
+            <button className="ftn-btn-signup" onClick={() => go('login')}>
+              <span>Sign in</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" />
+              </svg>
+            </button>
+          )}
+
           <button
             className={`ftn-burger${menuOpen ? ' open' : ''}`}
             aria-label="Toggle menu"

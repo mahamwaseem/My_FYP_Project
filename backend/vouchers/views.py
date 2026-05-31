@@ -53,6 +53,17 @@ from .serializers import (
 )
 from .filters import VoucherFilter
 
+# Role-based access control (Authentication & RBAC module).
+# JWTUserAuthentication resolves the Bearer token to a FinTrack user.
+# ReadOnlyOrAccounting: any signed-in user may GET (read); only admin +
+# accountant may POST/PUT/PATCH/DELETE (write). Viewers get 403 on writes.
+from users.auth import JWTUserAuthentication
+from users.permissions import ReadOnlyOrAccounting
+
+# Central system-wide audit trail.
+from audit.services import record as audit_record, diff_fields
+from audit.models import AuditAction
+
 
 # ── shared error helper ────────────────────────────────────────────────────
 
@@ -79,6 +90,11 @@ class VoucherViewSet(viewsets.ModelViewSet):
       audit     → returns the audit trail
       summary   → dashboard statistics
     """
+
+    # RBAC: everyone signed-in may view; only admin + accountant may create,
+    # edit, post, reverse, or delete vouchers. Viewers get 403 on writes.
+    authentication_classes = [JWTUserAuthentication]
+    permission_classes = [ReadOnlyOrAccounting]
 
     filter_backends  = [DjangoFilterBackend,
                         filters.SearchFilter,
@@ -116,6 +132,62 @@ class VoucherViewSet(viewsets.ModelViewSet):
             return VoucherHeaderWriteSerializer
         return VoucherHeaderReadSerializer
 
+    # ── Create (with audit) ────────────────────────────────────────
+    def create(self, request, *args, **kwargs):
+        response = super().create(request, *args, **kwargs)
+        try:
+            data = response.data.get('data', response.data) if hasattr(response, 'data') else {}
+            vno = data.get('voucher_no') or data.get('id')
+            audit_record(
+                AuditAction.CREATED, 'voucher', request=request,
+                entity_id=data.get('id', ''), entity_label=str(vno or ''),
+                note=f"{data.get('v_type', '')} voucher created as {data.get('status', 'DRAFT')}.".strip(),
+            )
+        except Exception:
+            pass
+        return response
+
+    # ── Update (with field-level diff audit) ───────────────────────
+    def update(self, request, *args, **kwargs):
+        before = None
+        try:
+            obj = self.get_object()
+            before = {
+                'v_type': obj.v_type, 'date': obj.date, 'reference': obj.reference,
+                'narration': obj.narration, 'status': obj.status,
+                'currency': getattr(obj.currency, 'code', None),
+                'exchange_rate': obj.exchange_rate,
+                'total_debit': getattr(obj, 'total_debit', None),
+                'total_credit': getattr(obj, 'total_credit', None),
+            }
+        except Exception:
+            pass
+
+        response = super().update(request, *args, **kwargs)
+
+        try:
+            obj = self.get_object()
+            after = {
+                'v_type': obj.v_type, 'date': obj.date, 'reference': obj.reference,
+                'narration': obj.narration, 'status': obj.status,
+                'currency': getattr(obj.currency, 'code', None),
+                'exchange_rate': obj.exchange_rate,
+                'total_debit': getattr(obj, 'total_debit', None),
+                'total_credit': getattr(obj, 'total_credit', None),
+            }
+            changes = diff_fields(before, after,
+                                  ['v_type', 'date', 'reference', 'narration',
+                                   'status', 'currency', 'exchange_rate',
+                                   'total_debit', 'total_credit'])
+            audit_record(
+                AuditAction.UPDATED, 'voucher', request=request,
+                entity_id=obj.id, entity_label=obj.voucher_no,
+                changes=changes, note='Voucher updated.',
+            )
+        except Exception:
+            pass
+        return response
+
     # ── Soft delete ────────────────────────────────────────────────
     def destroy(self, request, *args, **kwargs):
         voucher = self.get_object()
@@ -130,8 +202,13 @@ class VoucherViewSet(viewsets.ModelViewSet):
         VoucherAuditLog.objects.create(
             voucher      = voucher,
             action       = VoucherAuditLog.Action.DELETED,
-            performed_by = request.data.get('deleted_by'),
+            performed_by = _actor_id(request),
             notes        = "Soft-deleted by user.",
+        )
+        audit_record(
+            AuditAction.DELETED, 'voucher', request=request,
+            entity_id=voucher.id, entity_label=voucher.voucher_no,
+            note='Voucher soft-deleted.',
         )
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -144,19 +221,25 @@ class VoucherViewSet(viewsets.ModelViewSet):
         """
         voucher = self.get_object()
         try:
-            voucher.post(posted_by_id=request.data.get('approved_by'))
+            voucher.post(posted_by_id=_actor_id(request))
         except Exception as exc:
             return _error(exc)
 
         VoucherAuditLog.objects.create(
             voucher      = voucher,
             action       = VoucherAuditLog.Action.POSTED,
-            performed_by = request.data.get('approved_by'),
+            performed_by = _actor_id(request),
             notes        = f"Voucher posted at {timezone.now():%Y-%m-%d %H:%M}.",
             snapshot     = {
                 'total_debit' : str(voucher.total_debit),
                 'total_credit': str(voucher.total_credit),
             }
+        )
+        audit_record(
+            AuditAction.POSTED, 'voucher', request=request,
+            entity_id=voucher.id, entity_label=voucher.voucher_no,
+            changes=[{'field': 'status', 'old': 'DRAFT', 'new': 'POSTED'}],
+            note=f"Posted · Dr {voucher.total_debit} = Cr {voucher.total_credit}.",
         )
         serializer = VoucherHeaderReadSerializer(voucher)
         return _ok(serializer.data)
@@ -172,7 +255,7 @@ class VoucherViewSet(viewsets.ModelViewSet):
         try:
             reversal = voucher.create_reversal(
                 reversal_date = request.data.get('reversal_date'),
-                created_by_id = request.data.get('created_by'),
+                created_by_id = _actor_id(request),
             )
         except Exception as exc:
             return _error(exc)
@@ -180,8 +263,13 @@ class VoucherViewSet(viewsets.ModelViewSet):
         VoucherAuditLog.objects.create(
             voucher      = voucher,
             action       = VoucherAuditLog.Action.REVERSED,
-            performed_by = request.data.get('created_by'),
+            performed_by = _actor_id(request),
             notes        = f"Reversed. New voucher: {reversal.voucher_no}",
+        )
+        audit_record(
+            AuditAction.REVERSED, 'voucher', request=request,
+            entity_id=voucher.id, entity_label=voucher.voucher_no,
+            note=f"Reversed → new voucher {reversal.voucher_no}.",
         )
         serializer = VoucherHeaderReadSerializer(reversal)
         return _ok(serializer.data, status.HTTP_201_CREATED)
@@ -198,7 +286,7 @@ class VoucherViewSet(viewsets.ModelViewSet):
         data       = serializer.data
         data['print_meta'] = {
             'printed_at' : timezone.now().strftime('%Y-%m-%d %H:%M'),
-            'printed_by' : request.query_params.get('user_id', 'System'),
+            'printed_by' : getattr(request.user, 'name', None) or request.query_params.get('user_id', 'System'),
             'company'    : 'Multi Tech Solutions',
         }
         return _ok(data)
@@ -260,6 +348,8 @@ class VoucherViewSet(viewsets.ModelViewSet):
 # ══════════════════════════════════════════════
 
 class CurrencyViewSet(viewsets.ModelViewSet):
+    authentication_classes = [JWTUserAuthentication]
+    permission_classes = [ReadOnlyOrAccounting]
     queryset         = Currency.objects.filter(is_active=True)
     serializer_class = CurrencySerializer
     filter_backends  = [filters.SearchFilter, filters.OrderingFilter]
@@ -381,6 +471,8 @@ class RecurringScheduleViewSet(viewsets.ModelViewSet):
       POST   /api/vouchers/recurring/{id}/generate/  create+post the next voucher
       POST   /api/vouchers/recurring/{id}/toggle/    pause / resume
     """
+    authentication_classes = [JWTUserAuthentication]
+    permission_classes = [ReadOnlyOrAccounting]
     queryset         = RecurringSchedule.objects.select_related('template_voucher').prefetch_related('template_voucher__lines')
     serializer_class = RecurringScheduleSerializer
     filter_backends  = [DjangoFilterBackend, filters.OrderingFilter]
@@ -445,7 +537,7 @@ class RecurringScheduleViewSet(viewsets.ModelViewSet):
                     currency         = template.currency,
                     exchange_rate    = template.exchange_rate,
                     recurring_parent = template,
-                    created_by       = request.data.get('created_by'),
+                    created_by       = _actor_id(request),
                 )
                 for line in template.lines.all():
                     VoucherDetail.objects.create(
@@ -461,13 +553,13 @@ class RecurringScheduleViewSet(viewsets.ModelViewSet):
                     )
 
                 # post it (validates balance)
-                new_voucher.post(posted_by_id=request.data.get('created_by'))
+                new_voucher.post(posted_by_id=_actor_id(request))
 
                 # audit + advance the schedule
                 VoucherAuditLog.objects.create(
                     voucher      = new_voucher,
                     action       = VoucherAuditLog.Action.POSTED,
-                    performed_by = request.data.get('created_by'),
+                    performed_by = _actor_id(request),
                     notes        = f"Auto-generated from recurring schedule #{schedule.id} "
                                    f"({template.voucher_no}).",
                 )
@@ -475,8 +567,27 @@ class RecurringScheduleViewSet(viewsets.ModelViewSet):
         except Exception as exc:
             return _error(exc)
 
+        audit_record(
+            AuditAction.GENERATED, 'voucher', request=request,
+            entity_id=new_voucher.id, entity_label=new_voucher.voucher_no,
+            note=f"Auto-generated from recurring schedule #{schedule.id}.",
+        )
         serializer = VoucherHeaderReadSerializer(new_voucher)
         return _ok({
             'voucher': serializer.data,
             'schedule': self.get_serializer(schedule).data,
         }, status.HTTP_201_CREATED)
+
+
+# ── actor helper ────────────────────────────────────────────────────────────
+def _actor_id(request):
+    """
+    The id of the authenticated user performing the action (for the audit log's
+    performed_by). Falls back to any explicit id in the request body, then None.
+    """
+    uid = getattr(getattr(request, 'user', None), 'id', None)
+    if uid:
+        return uid
+    return (request.data.get('approved_by')
+            or request.data.get('created_by')
+            or request.data.get('deleted_by'))

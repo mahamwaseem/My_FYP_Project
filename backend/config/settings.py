@@ -18,6 +18,7 @@ INSTALLED_APPS = [
 
     # 3rd Party
     'rest_framework',
+    'rest_framework_simplejwt',
     'corsheaders',
     'django_filters',
 
@@ -28,6 +29,8 @@ INSTALLED_APPS = [
     'reports',          # Financial Statements & Reports module
     'templates',        # Voucher Templates module
     'reporting',        # Reporting module (operational + custom reports)
+    'users',            # Authentication & RBAC module
+    'audit'
 ]
 
 MIDDLEWARE = [
@@ -63,7 +66,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 
 # ── Database (SQL Server via mssql-django) ────────────────────────
-# All modules share this one database.
+# Both modules share this one database.
 # Change HOST to your SSMS server name.
 DATABASES = {
     'default': {

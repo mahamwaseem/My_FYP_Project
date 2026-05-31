@@ -6,6 +6,14 @@ const API = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
+// Attach the FinTrack auth token (stored by the Auth module) to every request
+// so writes (create / update / delete) pass the backend's RBAC checks.
+API.interceptors.request.use((config) => {
+  const token = localStorage.getItem("fintrack_access");
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
+
 API.interceptors.response.use(
   (response) => response,
   (error) => {

@@ -18,7 +18,7 @@ export default function AccountStatement({ data, loading, dateFrom, dateTo }) {
             <th className="amt">Balance</th>
           </tr>
         </thead>
-        {(loading || !data) ? <SkeletonRows cols={6} /> : (
+        {(loading || !data || !Array.isArray(data.rows)) ? <SkeletonRows cols={6} /> : (
           <tbody>
             <tr className="rp-opening">
               <td colSpan={5}>Opening balance brought forward</td>
@@ -36,7 +36,7 @@ export default function AccountStatement({ data, loading, dateFrom, dateTo }) {
             ))}
           </tbody>
         )}
-        {(!loading && data) && (
+        {(!loading && data && Array.isArray(data.rows)) && (
           <tfoot>
             <tr>
               <td colSpan={3}>Closing balance</td>

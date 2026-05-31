@@ -37,7 +37,7 @@ const modules = [
   { icon: 'scale',   name: 'Reports',              desc: 'Balances · summaries · audit',     route: 'reporting',      accent: '#f59e0b' },
   { icon: 'chart',   name: 'Financial Statements', desc: 'Balance Sheet · P&L · Cash Flow',  route: 'reports',        accent: '#ef4444' },
   { icon: 'palette', name: 'Voucher Templates',    desc: 'Reusable pre-filled entries',      route: 'templates',      accent: '#ec4899' },
-  { icon: 'shield',  name: 'Roles & Access',       desc: 'Admin · Accountant · Viewer',      route: null,             accent: '#64748b' },
+  { icon: 'shield',  name: 'Roles & Access',       desc: 'Admin · Accountant · Viewer',      route: 'users',          accent: '#64748b' },
   { icon: 'spark',   name: 'AI Insights',          desc: 'Anomaly & cash-flow forecast',     route: null,             accent: '#8b5cf6' },
 ];
 
@@ -169,7 +169,7 @@ export default function HomePage({ onNavigate }) {
               <span className="ft-module-name">{m.name}</span>
               <span className="ft-module-desc">{m.desc}</span>
               <span className={`ft-module-tag${m.route ? '' : ' muted'}`}>
-                {m.route ? <>Open <Icon name="arrow" size={14} /></> : 'In reports'}
+                {m.route ? <>Open <Icon name="arrow" size={14} /></> : 'Coming soon'}
               </span>
             </button>
           ))}

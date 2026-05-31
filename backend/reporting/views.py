@@ -15,6 +15,27 @@ from django.http import HttpResponse, JsonResponse
 
 from . import services
 
+# Authentication & RBAC: the Audit Trail report shows who performed each action,
+# so it is treated as administrative/security data — Admin only. All other
+# reports stay readable by everyone (Option B), matching professional systems.
+from users.auth import JWTUserAuthentication
+from users.permissions import IsAdmin
+from users.models import Role
+
+
+def _is_admin_request(request):
+    """True if the Bearer token resolves to an admin user. Used by the plain
+    (non-DRF) export view, which can't use DRF permission classes."""
+    try:
+        auth = JWTUserAuthentication()
+        result = auth.authenticate(request)
+        if not result:
+            return False
+        user, _token = result
+        return getattr(user, 'role', None) == Role.ADMIN
+    except Exception:
+        return False
+
 
 def _ok(data):
     return Response({'success': True, 'data': data})
@@ -42,6 +63,10 @@ class TransactionSummaryView(APIView):
 
 
 class AuditTrailView(APIView):
+    # Admin only — the audit trail is administrative/security data (who did what).
+    authentication_classes = [JWTUserAuthentication]
+    permission_classes = [IsAdmin]
+
     def get(self, request):
         p = _params(request)
         return _ok(services.audit_trail(date_from=p['date_from'], date_to=p['date_to']))
@@ -103,6 +128,12 @@ def report_export(request, report):
     """
     if report not in REPORT_FN:
         return JsonResponse({'success': False, 'detail': f'Unknown report: {report}'}, status=404)
+    # Audit trail is admin-only, including its export.
+    if report == 'audit' and not _is_admin_request(request):
+        return JsonResponse(
+            {'success': False, 'detail': 'The audit trail is available to administrators only.'},
+            status=403,
+        )
     fmt = (request.GET.get('format') or 'csv').lower()
     p = _export_params(request)
     data = REPORT_FN[report](p)

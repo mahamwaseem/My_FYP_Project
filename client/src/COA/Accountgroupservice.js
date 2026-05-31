@@ -8,6 +8,12 @@ const API = axios.create({
   },
 });
 
+API.interceptors.request.use((config) => {
+  const token = localStorage.getItem("fintrack_access");
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
+
 // Optional: global error logging
 API.interceptors.response.use(
   (response) => response,

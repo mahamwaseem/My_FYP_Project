@@ -44,10 +44,17 @@ export default function ApplyTemplate({ template, onClose, onCreated }) {
     if (res.ok) {
       toast.success(
         `${res.data.voucher_no} created${recurring ? ' · recurring ' + frequency.toLowerCase() : ''}.`,
-        res.demo ? 'Voucher created (demo)' : 'Voucher created'
+        'Voucher created'
       );
       onCreated && onCreated(res);
       onClose();
+    } else {
+      // Real failure (e.g. 403 = viewer has no permission). Show an honest
+      // error and keep the drawer open; nothing was created.
+      toast.error(
+        res.error || 'The voucher could not be created.',
+        res.status === 403 ? 'Access denied' : 'Could not create voucher'
+      );
     }
   };
 
