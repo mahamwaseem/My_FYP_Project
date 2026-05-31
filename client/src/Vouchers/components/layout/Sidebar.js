@@ -1,5 +1,6 @@
 import React from 'react';
 import './Sidebar.css';
+import { useAuth } from '../../../Auth';
 
 const NAV_ITEMS = [
   { id: 'dashboard',  icon: '⊞',  label: 'Dashboard',        section: 'main' },
@@ -9,22 +10,28 @@ const NAV_ITEMS = [
   { id: 'reports',    icon: '📊',  label: 'Reports',           section: 'reports' },
   { id: 'audit',      icon: '🔍',  label: 'Audit Log',         section: 'reports' },
   { id: 'coa',        icon: '📋',  label: 'Chart of Accounts', section: 'accounting' },
-  { id: 'settings',   icon: '⚙',   label: 'Settings',          section: 'system' },
 ];
 
 const SECTIONS = {
   main:        'Main',
   reports:     'Reports',
   accounting:  'Accounting',
-  system:      'System',
 };
 
+const ROLE_LABEL = { admin: 'Administrator', accountant: 'Accountant', viewer: 'Viewer' };
+
 export default function Sidebar({ activePage, onNavigate, mobileOpen, onOverlayClick }) {
+  const { user, role } = useAuth();
+
   const grouped = {};
   NAV_ITEMS.forEach((item) => {
     if (!grouped[item.section]) grouped[item.section] = [];
     grouped[item.section].push(item);
   });
+
+  const name = (user && user.name) || 'User';
+  const initials = name.split(' ').map((w) => w[0]).slice(0, 2).join('').toUpperCase() || 'U';
+  const roleLabel = ROLE_LABEL[role] || role || '';
 
   return (
     <>
@@ -61,13 +68,13 @@ export default function Sidebar({ activePage, onNavigate, mobileOpen, onOverlayC
           </div>
         ))}
 
-        {/* User footer */}
+        {/* User footer — real signed-in user */}
         <div className="sidebar-footer">
           <div className="sidebar-user">
-            <div className="sidebar-avatar">AB</div>
+            <div className="sidebar-avatar">{initials}</div>
             <div className="sidebar-user-info">
-              <span className="sidebar-user-name">Account User</span>
-              <span className="sidebar-user-role">Accountant</span>
+              <span className="sidebar-user-name">{name}</span>
+              <span className="sidebar-user-role">{roleLabel}</span>
             </div>
           </div>
         </div>

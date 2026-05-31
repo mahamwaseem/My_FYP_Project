@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './App.css';
-import { AuthProvider, RequireAuth, AdminUsers, PERMISSIONS } from './Auth';
+import { AuthProvider, RequireAuth, AdminUsers, AuthPage, useAuth, PERMISSIONS } from './Auth';
 import HomePage from './HomePage';
 import Navbar from './Navbar';
 import Accountgroup    from './COA/Accountgroup';
@@ -12,6 +12,7 @@ import TemplatesPage   from './VoucherTemplates/TemplatesPage';
 import GeneralLedgerPage from './GeneralLedger/GeneralLedger/GeneralLedgerPage';
 import FinancialStatementsPage from './FinancialStatements/FinancialStatementsPage';
 import ReportingPage from './Reporting/ReportingPage';
+import { FinancialDashboard } from './Dashboard';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
@@ -55,6 +56,16 @@ function App() {
         {/* PUBLIC — landing page, no login required */}
         {currentPage === 'home' && <HomePage onNavigate={navigate} />}
 
+        {/* Sign in — shows the auth page; navigates home once authenticated */}
+        {currentPage === 'login' && <LoginRoute onAuthed={goHome} />}
+
+        {/* Financial Dashboard — gated like the other modules */}
+        {currentPage === 'dashboard' && (
+          <RequireAuth onBack={goHome}>
+            <FinancialDashboard onBack={goHome} onNavigate={navigate} />
+          </RequireAuth>
+        )}
+
         {/* GATED — every real module requires login (no token = login screen) */}
         {currentPage === 'account-group' && (
           <RequireAuth onBack={goHome}><Accountgroup onBack={goHome} /></RequireAuth>
@@ -93,6 +104,18 @@ function App() {
       </div>
     </AuthProvider>
   );
+}
+
+/**
+ * Renders the sign-in / sign-up page. As soon as the user is authenticated
+ * (context flips isAuthenticated → true), it returns them to the homepage.
+ */
+function LoginRoute({ onAuthed }) {
+  const { isAuthenticated } = useAuth();
+  React.useEffect(() => {
+    if (isAuthenticated) onAuthed();
+  }, [isAuthenticated, onAuthed]);
+  return <AuthPage />;
 }
 
 export default App;

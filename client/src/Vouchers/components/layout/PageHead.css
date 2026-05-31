@@ -1,0 +1,64 @@
+/* FinTrack — bold module heading (replaces the old internal header bar) */
+.vp-pagehead {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin: 4px 0 26px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e8edf2;
+}
+
+.vp-pagehead-text { position: relative; padding-left: 16px; }
+
+/* teal accent bar on the left of the title */
+.vp-pagehead-text::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 4px; bottom: 4px;
+  width: 4px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #14b8a6, #0f766e);
+}
+
+.vp-title {
+  font-family: 'Sora', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: clamp(1.6rem, 2.4vw, 2.1rem);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  color: #0f172a;
+  margin: 0;
+}
+
+.vp-subtitle {
+  margin: 6px 0 0;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 0.92rem;
+  color: #64748b;
+  line-height: 1.4;
+}
+
+/* hamburger — only shows on mobile to open the sidebar */
+.vp-menu-btn {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  width: 40px; height: 40px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #fff;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.vp-menu-btn span {
+  display: block;
+  height: 2px; width: 18px;
+  margin: 0 auto;
+  background: #334155;
+  border-radius: 2px;
+}
+
+@media (max-width: 1024px) {
+  .vp-menu-btn { display: flex; }
+}

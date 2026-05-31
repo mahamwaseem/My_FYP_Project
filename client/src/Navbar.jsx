@@ -9,14 +9,14 @@ import { UserMenu, useAuth } from './Auth';
  * Props:
  *   onNavigate(routeKey) — optional; called for items that map to a route.
  *   active               — optional; current route key, to highlight a link.
+ *   onBack / canGoBack   — optional; renders a Back button on the LEFT.
  */
 const NAV_LINKS = [
-  { label: 'Dashboard',         target: 'overview' },
-  { label: 'Modules',           target: 'modules' },
+  { label: 'Dashboard',         route: 'dashboard' },
   { label: 'Chart of Accounts', route: 'account-group' },
   { label: 'Vouchers',          route: 'vouchers' },
   { label: 'General Ledger',    route: 'general-ledger' },
-  { label: 'Reports',           target: 'features' },
+  { label: 'Reports',           route: 'reporting' },
 ];
 
 export default function Navbar({ onNavigate, active, onBack, canGoBack }) {
@@ -40,14 +40,27 @@ export default function Navbar({ onNavigate, active, onBack, canGoBack }) {
   return (
     <nav className={`ftn${scrolled ? ' ftn--scrolled' : ''}`}>
       <div className="ftn-inner">
-        {/* Brand */}
-        <a href="#overview" className="ftn-logo" onClick={(e) => { e.preventDefault(); go('home'); }}>
-          <span className="ftn-logo-mark">F</span>
-          <span className="ftn-logo-text">
-            <span className="ftn-logo-name">FinTrack</span>
-            <span className="ftn-logo-sub">Double-Entry Accounting</span>
-          </span>
-        </a>
+        {/* LEFT: optional Back button + Brand */}
+        <div className="ftn-left">
+          {onBack && canGoBack && (
+            <button className="ftn-back" type="button" onClick={onBack} aria-label="Go back">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <polyline points="15 18 9 12 15 6" />
+                <line x1="19" y1="12" x2="9" y2="12" />
+              </svg>
+              <span>Back</span>
+            </button>
+          )}
+
+          <a href="#overview" className="ftn-logo" onClick={(e) => { e.preventDefault(); go('home'); }}>
+            <span className="ftn-logo-mark">F</span>
+            <span className="ftn-logo-text">
+              <span className="ftn-logo-name">FinTrack</span>
+              <span className="ftn-logo-sub">Double-Entry Accounting</span>
+            </span>
+          </a>
+        </div>
 
         {/* Links */}
         <div className={`ftn-links${menuOpen ? ' open' : ''}`}>
@@ -65,25 +78,8 @@ export default function Navbar({ onNavigate, active, onBack, canGoBack }) {
 
         {/* Actions */}
         <div className="ftn-actions">
-          {onBack && canGoBack && (
-            <button className="ftn-back" type="button" onClick={onBack}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                   strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <polyline points="15 18 9 12 15 6" />
-                <line x1="19" y1="12" x2="9" y2="12" />
-              </svg>
-              Back
-            </button>
-          )}
-          <button className="ftn-search" aria-label="Search">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                 strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <circle cx="11" cy="11" r="7" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
-            </svg>
-          </button>
-
           {/* When signed in → user menu (avatar · role · logout · admin link).
-              When not signed in → Sign in button. */}
+              When not signed in → Sign in button (opens the auth page). */}
           {isAuthenticated ? (
             <UserMenu onManageUsers={() => go('users')} />
           ) : (

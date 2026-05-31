@@ -236,3 +236,33 @@
   .au-summary { grid-template-columns: 1fr 1fr; }
   .au-tb-sub { display: none; }
 }
+
+/* ── password modals: input-with-icon + eye + hint + user name/email ──────── */
+/* (aliases so the Reset/Change Password modals match the rest of the UI) */
+.au-input-wrap {
+  display: flex; align-items: center; gap: 10px;
+  background: #fff; border: 1px solid var(--line); border-radius: 9px;
+  padding: 0 13px; transition: border-color .2s, box-shadow .2s;
+}
+.au-input-wrap:focus-within { border-color: var(--teal); box-shadow: 0 0 0 3px var(--teal-soft); }
+.au-input-wrap .au-input {
+  flex: 1; border: none; outline: none; background: none;
+  font-family: var(--body); font-size: .9rem; color: var(--ink);
+  padding: 12px 0; display: block;
+}
+.au-input-wrap .au-input:focus-within { border: none; box-shadow: none; }
+.au-input-ic { color: var(--faint); flex-shrink: 0; display: grid; place-items: center; }
+.au-input-eye {
+  border: none; background: none; cursor: pointer; color: var(--faint);
+  padding: 4px; display: grid; place-items: center; flex-shrink: 0;
+}
+.au-input-eye:hover { color: var(--teal); }
+
+.au-hint { font-size: .78rem; color: var(--ink-soft); line-height: 1.45; }
+
+.au-modal-user-name { font-family: var(--display); font-weight: 600; font-size: 1rem; display: block; }
+.au-modal-user-email { font-family: var(--mono); font-size: .8rem; color: var(--ink-soft); margin-top: 2px; display: block; }
+
+/* a touch of padding around the password fields inside the modal */
+.au-modal .au-field { padding: 16px 24px 0; }
+.au-modal .au-field:last-of-type { padding-bottom: 4px; }
